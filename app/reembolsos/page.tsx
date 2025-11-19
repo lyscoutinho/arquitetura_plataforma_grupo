@@ -1,160 +1,151 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Filter } from 'lucide-react'
-import { PageHeader } from "@/components/page-header"
+import { Plus, Search, Filter, Loader2, CheckCircle } from 'lucide-react'
+import { PageHeader } from "@/components/page-header" // Verifique se este componente existe, se não, use um título simples
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { StatusBadge } from "@/components/status-badge"
-import { useAppContext } from "@/app/context/AppContext"
+import { StatusBadge } from "@/components/status-badge" // Verifique se existe
+import { useAppContext } from "@/app/context/AppContext" // IMPORTANTE: Contexto da Arquitetura SPA
+import { ReembolsoService } from "@/Services/reembolso-service"
+import { Reembolso } from "@/Types/reembolso"
 
 export default function ReembolsosPage() {
+  // Integração com a arquitetura SPA do grupo
   const { addNotification } = useAppContext()
 
-  const handleNotificationTest = () => {
-    addNotification({
-      type: "success",
-      message: "Notificação de teste criada com sucesso!"
-    })
+  const [reembolsos, setReembolsos] = useState<Reembolso[]>([])
+  const [loading, setLoading] = useState(true)
+  const [termoBusca, setTermoBusca] = useState("")
+
+  // Função que busca os dados do nosso Service (Mock)
+  const carregarDados = async () => {
+    setLoading(true)
+    try {
+      const dados = await ReembolsoService.listarTodos()
+      setReembolsos(dados)
+    } catch (error) {
+      addNotification({ type: "error", message: "Erro ao carregar reembolsos" })
+    } finally {
+      setLoading(false)
+    }
   }
+
+  // Carrega assim que a tela abre
+  useEffect(() => {
+    carregarDados()
+  }, [])
+
+  const handleAprovar = async (id: string) => {
+    await ReembolsoService.atualizarStatus(id, 'Aprovado')
+    addNotification({ type: "success", message: `Reembolso #${id} aprovado com sucesso!` })
+    carregarDados() // Atualiza a lista
+  }
+
+  // Filtro local simples
+  const listaFiltrada = reembolsos.filter(r => 
+    r.descricao.toLowerCase().includes(termoBusca.toLowerCase()) ||
+    r.nomeFuncionario.toLowerCase().includes(termoBusca.toLowerCase())
+  )
 
   return (
     <DashboardLayout>
+      {/* Se PageHeader não existir, troque por uma div com h1 */}
       <PageHeader
-        title="Reembolsos"
-        description="Gerencie solicitações de reembolso de despesas"
-        breadcrumbs={[{ label: "Início", href: "/" }, { label: "Reembolsos" }]}
+        title="Gestão de Reembolsos"
+        description="Visualize e gerencie solicitações de despesas"
+        breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Reembolsos" }]}
         actions={
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleNotificationTest}>
-              Testar Notificação
-            </Button>
-            <Button className="bg-orange-500 hover:bg-orange-600" asChild>
-              <Link href="/reembolsos/novo">
-                <Plus className="mr-2 h-4 w-4" />
-                Nova Solicitação
-              </Link>
-            </Button>
-          </div>
+          <Button className="bg-orange-500 hover:bg-orange-600" asChild>
+            <Link href="/reembolsos/novo">
+              <Plus className="mr-2 h-4 w-4" />
+              Nova Solicitação
+            </Link>
+          </Button>
         }
       />
 
-      <Card className="border-gray-800 bg-black">
+      <Card className="border-gray-800 bg-black mt-6">
         <CardContent className="p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex w-full flex-1 items-center gap-2 rounded-md border border-gray-800 bg-gray-950 px-2 py-1">
-              <Search className="h-4 w-4 text-gray-500" />
-              <Input
-                placeholder="Buscar por funcionário, categoria ou descrição..."
-                className="h-8 border-0 bg-transparent text-sm placeholder:text-gray-500 focus-visible:ring-0"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" className="border-gray-800 text-gray-300 hover:bg-gray-950">
-                <Filter className="mr-2 h-4 w-4" />
-                Filtros
-              </Button>
-            </div>
+          {/* Barra de Busca */}
+          <div className="flex items-center gap-2 rounded-md border border-gray-800 bg-gray-950 px-2 py-1 mb-4">
+            <Search className="h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Buscar por descrição ou funcionário..."
+              value={termoBusca}
+              onChange={(e) => setTermoBusca(e.target.value)}
+              className="h-8 border-0 bg-transparent text-sm placeholder:text-gray-500 focus-visible:ring-0 text-white"
+            />
           </div>
 
-          <div className="mt-4">
-            <Tabs defaultValue="todas">
-              <TabsList className="grid w-full grid-cols-4 bg-gray-950">
-                {[
-                  { v: "todas", l: "Todas" },
-                  { v: "pendentes", l: "Pendentes" },
-                  { v: "aprovadas", l: "Aprovadas" },
-                  { v: "rejeitadas", l: "Rejeitadas" },
-                ].map((t) => (
-                  <TabsTrigger
-                    key={t.v}
-                    value={t.v}
-                    className="data-[state=active]:bg-orange-500 data-[state=active]:text-white"
-                  >
-                    {t.l}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+          <Tabs defaultValue="todas">
+            <TabsList className="grid w-full grid-cols-4 bg-gray-950">
+              <TabsTrigger value="todas">Todas</TabsTrigger>
+              <TabsTrigger value="pendentes">Pendentes</TabsTrigger>
+              <TabsTrigger value="aprovadas">Aprovadas</TabsTrigger>
+              <TabsTrigger value="rejeitadas">Rejeitadas</TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="todas" className="mt-4">
-                <div className="rounded-lg border border-gray-800">
-                  <div className="max-h-[480px] overflow-auto">
-                    <Table>
-                      <TableHeader className="sticky top-0 z-10 bg-black">
-                        <TableRow className="border-gray-800">
-                          <TableHead className="text-gray-300">ID</TableHead>
-                          <TableHead className="text-gray-300">Funcionário</TableHead>
-                          <TableHead className="text-gray-300">Categoria</TableHead>
-                          <TableHead className="text-gray-300">Descrição</TableHead>
-                          <TableHead className="text-gray-300">Valor</TableHead>
-                          <TableHead className="text-gray-300">Data</TableHead>
-                          <TableHead className="text-gray-300">Status</TableHead>
-                          <TableHead className="text-gray-300">Ações</TableHead>
+            <TabsContent value="todas" className="mt-4">
+              <div className="rounded-lg border border-gray-800">
+                {loading ? (
+                  <div className="flex h-40 items-center justify-center text-white">
+                    <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader className="bg-gray-950">
+                      <TableRow className="border-gray-800 hover:bg-gray-900">
+                        <TableHead className="text-gray-400">Funcionário</TableHead>
+                        <TableHead className="text-gray-400">Categoria</TableHead>
+                        <TableHead className="text-gray-400">Valor</TableHead>
+                        <TableHead className="text-gray-400">Status</TableHead>
+                        <TableHead className="text-gray-400 text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {listaFiltrada.map((item) => (
+                        <TableRow key={item.id} className="border-gray-800 hover:bg-gray-900/50">
+                          <TableCell className="text-white font-medium">{item.nomeFuncionario}</TableCell>
+                          <TableCell className="text-gray-300">{item.categoria}</TableCell>
+                          <TableCell className="text-gray-300">
+                            {item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                          </TableCell>
+                          <TableCell>
+                            {/* Se StatusBadge não existir, use um span simples */}
+                            {item.status === 'Aprovado' ? (
+                              <span className="px-2 py-1 rounded bg-green-900/30 text-green-400 text-xs">Aprovado</span>
+                            ) : item.status === 'Rejeitado' ? (
+                              <span className="px-2 py-1 rounded bg-red-900/30 text-red-400 text-xs">Rejeitado</span>
+                            ) : (
+                              <span className="px-2 py-1 rounded bg-yellow-900/30 text-yellow-400 text-xs">Pendente</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {item.status === 'Pendente' && (
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={() => handleAprovar(item.id)}
+                                className="text-green-500 hover:text-green-400 hover:bg-green-950"
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" /> Aprovar
+                              </Button>
+                            )}
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {[
-                          { id: "R001", nome: "João Silva", cat: "Combustível", desc: "Viagem cliente ABC", valor: "R$ 120,00", data: "10/06/2025", status: "Pendente" },
-                          { id: "R002", nome: "Maria Santos", cat: "Alimentação", desc: "Almoço com cliente XYZ", valor: "R$ 85,50", data: "09/06/2025", status: "Aprovado" },
-                          { id: "R003", nome: "Pedro Costa", cat: "Material", desc: "Materiais de escritório", valor: "R$ 245,30", data: "08/06/2025", status: "Pendente" },
-                          { id: "R004", nome: "Ana Oliveira", cat: "Transporte", desc: "Uber para reunião", valor: "R$ 32,50", data: "07/06/2025", status: "Rejeitado" },
-                          { id: "R005", nome: "Carlos Mendes", cat: "Hospedagem", desc: "Hotel viagem negócios", valor: "R$ 450,00", data: "06/06/2025", status: "Aprovado" },
-                        ].map((r, idx) => (
-                          <TableRow
-                            key={r.id}
-                            className={`border-gray-800 hover:bg-gray-950 ${idx % 2 === 0 ? "bg-black" : "bg-gray-950/60"}`}
-                          >
-                            <TableCell className="font-mono text-white">#{r.id}</TableCell>
-                            <TableCell className="text-white">{r.nome}</TableCell>
-                            <TableCell className="text-white">{r.cat}</TableCell>
-                            <TableCell className="text-white">{r.desc}</TableCell>
-                            <TableCell className="text-white">{r.valor}</TableCell>
-                            <TableCell className="text-white">{r.data}</TableCell>
-                            <TableCell className="text-white">
-                              <StatusBadge status={r.status as any} />
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex gap-2">
-                                {r.status === "Pendente" && (
-                                  <Button size="sm" className="bg-green-600 text-white hover:bg-green-700">
-                                    Aprovar
-                                  </Button>
-                                )}
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-gray-800 text-gray-300 hover:bg-gray-950"
-                                >
-                                  Ver
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-
-                  {/* Paginação simples */}
-                  <div className="flex items-center justify-between border-t border-gray-800 bg-black px-3 py-2 text-sm text-gray-400">
-                    <span>Mostrando 1–5 de 28</span>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="border-gray-800 text-gray-300 hover:bg-gray-950">
-                        Anterior
-                      </Button>
-                      <Button variant="outline" size="sm" className="border-gray-800 text-gray-300 hover:bg-gray-950">
-                        Próximo
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </DashboardLayout>
