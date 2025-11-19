@@ -4,7 +4,7 @@ import Link from "next/link"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowDown, ArrowUp, DollarSign, Package, Receipt, Users } from 'lucide-react'
+import { ArrowDown, ArrowUp, DollarSign, Package, Receipt, Users, LogIn } from 'lucide-react'
 import { PageHeader } from "@/components/page-header"
 import { useAppContext } from "@/app/context/AppContext"
 import { useSPANavigation } from "@/hooks/use-spa-navigation"
@@ -39,10 +39,17 @@ export default function Dashboard() {
         description="Visão geral do desempenho da empresa"
         actions={
           <div className="flex gap-2">
-            <Button onClick={handleWelcomeUser}>
-              {userInfo ? `Olá, ${userInfo.name}` : "Login"}
+            <Button onClick={handleWelcomeUser} className="bg-gray-700 hover:bg-gray-600 text-white">
+              <div className="flex items-center gap-2">
+                {userInfo ? `Olá, ${userInfo.name}` : <><LogIn className="h-4 w-4" /> Login</>}
+              </div>
             </Button>
-            <Button className="bg-orange-500 hover:bg-orange-600">Nova Transação</Button>
+            {/* Otimizando o botão Nova Transação com Link/Button */}
+            <Link href="/transacao/nova" passHref>
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
+                  Nova Transação
+                </Button>
+            </Link>
           </div>
         }
         breadcrumbs={[{ label: "Início", href: "/" }, { label: "Dashboard" }]}
@@ -131,9 +138,10 @@ export default function Dashboard() {
             <Button className="w-full justify-start bg-orange-500 text-white hover:bg-orange-600" asChild>
               <a href="/reembolsos/novo">Solicitar Reembolso</a>
             </Button>
+            {/* CORREÇÃO: Removido variant="outline" e aplicada classe Tailwind para contorno */}
             <Button
-              variant="outline"
-              className="w-full justify-start border-gray-800 text-gray-300 hover:bg-gray-950"
+              // variant="outline" <-- REMOVIDO
+              className="w-full justify-start border-gray-800 text-gray-300 hover:bg-gray-950 border bg-transparent" // Adicionado border/bg-transparent para simular outline
               asChild
             >
               <a href="/vendas">Nova Venda</a>
