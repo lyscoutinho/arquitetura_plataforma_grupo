@@ -162,16 +162,16 @@ export default function RelatoriosPage() {
                     <div className="flex gap-2">
                       {relatorio.status === "Disponível" ? (
                         <>
-                          <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
-                            <Download className="h-3 w-3 mr-1" />
+                          <Button className="bg-orange-500 hover:bg-orange-600">
+                            <Download className="h-4 w-4 mr-1" />
                             Download
                           </Button>
-                          <Button size="sm" variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-800">
+                          <Button variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-800">
                             Ver
                           </Button>
                         </>
                       ) : (
-                        <Button size="sm" variant="outline" className="border-gray-700 text-gray-500" disabled>
+                        <Button variant="outline" className="border-gray-700 text-gray-500" disabled>
                           Aguardar
                         </Button>
                       )}
