@@ -1,13 +1,12 @@
 "use client"
 
-// Componentes para a interface de relatórios e análises
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PageHeader } from "@/components/page-header"
+import { DashboardLayout } from "../../components/dashboard-layout"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Input } from "../../components/ui/input"
+import { Badge } from "../../components/ui/badge"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
+import { PageHeader } from "../../components/page-header"
 // Ícones relacionados a dados, arquivos e análises
 import { ArrowUp, ArrowDown, BarChart3, FileText, Download, Calendar } from 'lucide-react'
 
@@ -166,12 +165,19 @@ export default function RelatoriosPage() {
                             <Download className="h-4 w-4 mr-1" />
                             Download
                           </Button>
-                          <Button variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-800">
+                          {/* CORREÇÃO: Removido variant="outline" e adicionadas classes para simular o estilo de contorno */}
+                          <Button 
+                            className="border border-gray-700 bg-transparent text-gray-300 hover:bg-gray-800"
+                          >
                             Ver
                           </Button>
                         </>
                       ) : (
-                        <Button variant="outline" className="border-gray-700 text-gray-500" disabled>
+                        // CORREÇÃO DE SINTAXE JSX: Removida a chave desnecessária {} ao redor do Button.
+                        <Button 
+                          className="border border-gray-700 bg-transparent text-gray-500" 
+                          disabled
+                        >
                           Aguardar
                         </Button>
                       )}
