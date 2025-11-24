@@ -2,12 +2,37 @@
 
 import Link from "next/link"
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowDown, ArrowUp, DollarSign, Package, Receipt, Users, LogIn } from 'lucide-react'
+import { ArrowDown, ArrowUp, DollarSign, Package, Receipt, Users, LogIn, FileText, Briefcase, AlertCircle } from 'lucide-react'
 import { PageHeader } from "@/components/page-header"
 import { useAppContext } from "@/app/context/AppContext"
 import { useSPANavigation } from "@/hooks/use-spa-navigation"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend } from "recharts"
+
+// Mock Data for Charts
+const revenueData = [
+  { name: "Jan", total: 15000 },
+  { name: "Fev", total: 22000 },
+  { name: "Mar", total: 18000 },
+  { name: "Abr", total: 28000 },
+  { name: "Mai", total: 24000 },
+  { name: "Jun", total: 35000 },
+]
+
+const contractStatusData = [
+  { name: "Ativos", value: 12, color: "#22c55e" }, // green-500
+  { name: "Finalizados", value: 8, color: "#3b82f6" }, // blue-500
+  { name: "Cancelados", value: 2, color: "#ef4444" }, // red-500
+  { name: "Pendentes", value: 4, color: "#eab308" }, // yellow-500
+]
+
+const reimbursementCategoryData = [
+  { name: "Transporte", value: 4500 },
+  { name: "Alimentação", value: 3200 },
+  { name: "Hospedagem", value: 2100 },
+  { name: "Outros", value: 800 },
+]
 
 export default function Dashboard() {
   const { addNotification, userInfo, setUserInfo } = useAppContext()
@@ -17,7 +42,7 @@ export default function Dashboard() {
     if (!userInfo) {
       setUserInfo({
         id: "1",
-        name: "João Silva", 
+        name: "João Silva",
         email: "joao@empresa.com",
         role: "admin"
       })
@@ -28,15 +53,11 @@ export default function Dashboard() {
     }
   }
 
-  const handleNavigateToReports = () => {
-    navigate("/reembolsos", true)
-  }
-
   return (
     <DashboardLayout>
       <PageHeader
         title="Dashboard"
-        description="Visão geral do desempenho da empresa"
+        description="Visão geral de Contratos, Clientes e Reembolsos"
         actions={
           <div className="flex gap-2">
             <Button onClick={handleWelcomeUser} className="bg-gray-700 hover:bg-gray-600 text-white">
@@ -44,11 +65,10 @@ export default function Dashboard() {
                 {userInfo ? `Olá, ${userInfo.name}` : <><LogIn className="h-4 w-4" /> Login</>}
               </div>
             </Button>
-            {/* Otimizando o botão Nova Transação com Link/Button */}
             <Link href="/transacao/nova" passHref>
-                <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
-                  Nova Transação
-                </Button>
+              <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
+                Nova Transação
+              </Button>
             </Link>
           </div>
         }
@@ -57,94 +77,192 @@ export default function Dashboard() {
 
       {/* KPIs */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[{
-          title: "Receita Total",
-          icon: DollarSign,
-          value: "R$ 45.231,89",
-          delta: "+20.1% do mês passado",
-          deltaIcon: ArrowUp,
-          deltaClass: "text-green-400",
-        }, {
-          title: "Reembolsos Pendentes",
-          icon: Receipt,
-          value: "R$ 3.240,50",
-          delta: "8 solicitações",
-          deltaIcon: null,
-          deltaClass: "text-yellow-400",
-        }, {
-          title: "Funcionários Ativos",
-          icon: Users,
-          value: "24",
-          delta: "+2 este mês",
-          deltaIcon: ArrowUp,
-          deltaClass: "text-green-400",
-        }, {
-          title: "Produtos em Estoque",
-          icon: Package,
-          value: "1.234",
-          delta: "32 com estoque baixo",
-          deltaIcon: ArrowDown,
-          deltaClass: "text-red-400",
-        }].map((kpi, i) => (
-          <Card key={i} className="border-gray-800 bg-black">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-300">{kpi.title}</CardTitle>
-                <kpi.icon className="h-4 w-4 text-orange-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold text-white">{kpi.value}</div>
-              <p className={`mt-1 flex items-center text-xs ${kpi.deltaClass}`}>
-                {kpi.deltaIcon ? <kpi.deltaIcon className="mr-1 h-3 w-3" /> : null}
-                {kpi.delta}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+        <Card className="border-gray-800 bg-black">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300">
+              Receita de Contratos
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">R$ 142.000,00</div>
+            <p className="text-xs text-gray-400">
+              +20.1% em relação ao mês passado
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-gray-800 bg-black">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300">
+              Contratos Ativos
+            </CardTitle>
+            <Briefcase className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">12</div>
+            <p className="text-xs text-gray-400">
+              4 contratos finalizando este mês
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-gray-800 bg-black">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300">
+              Reembolsos Pendentes
+            </CardTitle>
+            <Receipt className="h-4 w-4 text-yellow-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">8</div>
+            <p className="text-xs text-gray-400">
+              Valor total: R$ 3.240,50
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-gray-800 bg-black">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300">
+              Clientes Ativos
+            </CardTitle>
+            <Users className="h-4 w-4 text-orange-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">24</div>
+            <p className="text-xs text-gray-400">
+              +2 novos clientes este mês
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Seções */}
-      <div className="mt-6 grid gap-6 md:grid-cols-2">
-        <Card className="border-gray-800 bg-black">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-white">Reembolsos Recentes</CardTitle>
+      {/* Charts Section */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">
+        <Card className="col-span-4 border-gray-800 bg-black">
+          <CardHeader>
+            <CardTitle className="text-white">Receita Mensal</CardTitle>
+            <CardDescription className="text-gray-400">
+              Faturamento dos últimos 6 meses
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {[
-              { nome: "João Silva - Combustível", quando: "Hoje, 14:30", valor: "R$ 120,00", status: "Pendente", classe: "text-yellow-400 bg-yellow-500/15" },
-              { nome: "Maria Santos - Almoço Cliente", quando: "Ontem, 16:45", valor: "R$ 85,50", status: "Aprovado", classe: "text-green-400 bg-green-500/15" },
-              { nome: "Pedro Costa - Material Escritório", quando: "2 dias atrás", valor: "R$ 245,30", status: "Pendente", classe: "text-yellow-400 bg-yellow-500/15" },
-            ].map((r, i) => (
-              <div key={i} className="flex items-center justify-between rounded-lg bg-gray-950 p-3">
-                <div>
-                  <p className="font-medium text-white">{r.nome}</p>
-                  <p className="text-xs text-gray-500">{r.quando}</p>
+          <CardContent className="pl-2">
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={revenueData}>
+                <XAxis
+                  dataKey="name"
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `R$${value}`}
+                />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }}
+                  cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
+                />
+                <Bar dataKey="total" fill="#f97316" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <Card className="col-span-3 border-gray-800 bg-black">
+          <CardHeader>
+            <CardTitle className="text-white">Status dos Contratos</CardTitle>
+            <CardDescription className="text-gray-400">
+              Distribuição atual dos contratos
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={350}>
+              <PieChart>
+                <Pie
+                  data={contractStatusData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {contractStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }}
+                />
+                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Activity & Quick Actions */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
+        <Card className="col-span-2 border-gray-800 bg-black">
+          <CardHeader>
+            <CardTitle className="text-white">Últimos Reembolsos</CardTitle>
+            <CardDescription className="text-gray-400">
+              Solicitações recentes que precisam de atenção
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-8">
+              {[
+                { nome: "João Silva", desc: "Combustível - Visita Cliente", valor: "R$ 120,00", status: "Pendente", time: "2h atrás" },
+                { nome: "Maria Santos", desc: "Almoço Corporativo", valor: "R$ 85,50", status: "Aprovado", time: "5h atrás" },
+                { nome: "Pedro Costa", desc: "Material de Escritório", valor: "R$ 245,30", status: "Pendente", time: "1 dia atrás" },
+                { nome: "Ana Oliveira", desc: "Hospedagem - Conferência", valor: "R$ 1.200,00", status: "Em Análise", time: "2 dias atrás" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none text-white">{item.nome}</p>
+                    <p className="text-sm text-gray-400">{item.desc}</p>
+                  </div>
+                  <div className="ml-auto font-medium text-white">{item.valor}</div>
+                  <div className={`ml-4 text-xs px-2 py-1 rounded-full ${item.status === 'Aprovado' ? 'bg-green-500/20 text-green-400' :
+                      item.status === 'Pendente' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-blue-500/20 text-blue-400'
+                    }`}>
+                    {item.status}
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium text-white">{r.valor}</p>
-                  <span className={`mt-1 inline-block rounded px-2 py-0.5 text-xs ${r.classe}`}>{r.status}</span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </CardContent>
         </Card>
 
         <Card className="border-gray-800 bg-black">
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle className="text-white">Ações Rápidas</CardTitle>
+            <CardDescription className="text-gray-400">
+              Atalhos para as tarefas mais comuns
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             <Button className="w-full justify-start bg-orange-500 text-white hover:bg-orange-600" asChild>
-              <a href="/reembolsos/novo">Solicitar Reembolso</a>
+              <Link href="/reembolsos/novo">
+                <Receipt className="mr-2 h-4 w-4" />
+                Solicitar Reembolso
+              </Link>
             </Button>
-            {/* CORREÇÃO: Removido variant="outline" e aplicada classe Tailwind para contorno */}
-            <Button
-              // variant="outline" <-- REMOVIDO
-              className="w-full justify-start border-gray-800 text-gray-300 hover:bg-gray-950 border bg-transparent" // Adicionado border/bg-transparent para simular outline
-              asChild
-            >
-              <a href="/vendas">Nova Venda</a>
+            <Button className="w-full justify-start border-gray-700 text-gray-300 hover:bg-gray-900 hover:text-white bg-transparent border" asChild>
+              <Link href="/contratos/novo">
+                <FileText className="mr-2 h-4 w-4" />
+                Novo Contrato
+              </Link>
+            </Button>
+            <Button className="w-full justify-start border-gray-700 text-gray-300 hover:bg-gray-900 hover:text-white bg-transparent border" asChild>
+              <Link href="/clientes/novo">
+                <Users className="mr-2 h-4 w-4" />
+                Cadastrar Cliente
+              </Link>
             </Button>
           </CardContent>
         </Card>
