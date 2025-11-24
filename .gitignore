@@ -1,0 +1,104 @@
+# compiled output
+# Build output
+/.next
+/out
+/dist
+/build
+/node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# temp directory
+# temp directories
+.temp
+.tmp
+
+# Next.js / framework caches
+.next/
+.next/cache/
+.turbo/
+.vercel/
+.vercel_build_output/
+.cache/
+.parcel-cache/
+
+# pnpm store
+.pnpm-store/
+
+# Build artifacts
+dist/
+build/
+
+# System files
+.DS_Store
+
+# Editor directories and files
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# VSCode: ignore everything but keep workspace settings and recommended extensions
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Optional: lockfiles and package managers
+# Keep pnpm lockfile tracked; ignore npm/yarn locks if accidentally generated
+package-lock.json
+yarn.lock
+
+# Optional local env overrides and secrets
+/.env.local
+/.env.*.local
