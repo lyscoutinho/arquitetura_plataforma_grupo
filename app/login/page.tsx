@@ -1,69 +1,37 @@
 "use client"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useAppContext } from "@/app/context/AppContext"
-import { useSPANavigation } from "@/hooks/use-spa-navigation"
+import { useState } from 'react'
+import { apiLogin } from '@/lib/api'
+import { useAppContext } from '@/app/context/AppContext'
+import { useSPANavigation } from '@/hooks/use-spa-navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export default function LoginPage() {
-  const { setUserInfo } = useAppContext()
+  const { setUserInfo, setToken } = useAppContext()
   const { navigate } = useSPANavigation()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-
-  const handleLogin = (e: React.FormEvent) => {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
-
-    // validação real (API)
-    if (email.length === 0 || password.length === 0) {
-      alert("Preencha email e senha.")
-      return
+    try {
+      const res = await apiLogin(email, password)
+      setUserInfo(res.user)
+      setToken(res.access_token)
+      navigate('/', true)
+    } catch (err) {
+      setError(err.message || 'Erro no login')
     }
-
-    // Usuário falso só para testes
-    setUserInfo({
-      id: "1",
-      name: "Usuário Teste",
-      email,
-      role: "admin",
-    })
-
-    navigate("/", true) // volta ao Dashboard
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black">
-      <form 
-        onSubmit={handleLogin}
-        className="bg-gray-900 p-8 rounded-2xl shadow-lg w-full max-w-sm border border-gray-800"
-      >
-        <h1 className="text-white text-2xl mb-6 text-center">Login</h1>
-
-        <label className="text-gray-400 text-sm">Email</label>
-        <Input
-          type="email"
-          className="bg-gray-800 border-gray-700 text-white mb-4"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <label className="text-gray-400 text-sm">Senha</label>
-        <Input
-          type="password"
-          className="bg-gray-800 border-gray-700 text-white mb-6"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <Button 
-          type="submit"
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-        >
-          Entrar
-        </Button>
-      </form>
-    </div>
+    <form onSubmit={handleLogin} className="...">
+      <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+      <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      {error && <div className="text-red-400">{error}</div>}
+      <Button type="submit">Entrar</Button>
+    </form>
   )
 }
+
