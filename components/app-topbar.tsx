@@ -13,11 +13,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+import { useAppContext } from "@/app/context/AppContext"
+
 interface AppTopbarProps {
   onOpenSidebar?: () => void
 }
 
 export function AppTopbar({ onOpenSidebar }: AppTopbarProps) {
+  const { logout, userInfo } = useAppContext()
+
   return (
     <header className="sticky top-0 z-40 border-b border-gray-800 bg-black/70 backdrop-blur supports-[backdrop-filter]:bg-black/50">
       <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4">
@@ -54,9 +58,11 @@ export function AppTopbar({ onOpenSidebar }: AppTopbarProps) {
               <button className="flex items-center gap-2 rounded-md border border-gray-800 bg-gray-950 px-2 py-1 text-left text-sm text-gray-200 hover:bg-gray-900">
                 <Avatar className="h-7 w-7">
                   <AvatarImage src="/diverse-user-avatars.png" alt="Usuário" />
-                  <AvatarFallback className="bg-orange-500">JS</AvatarFallback>
+                  <AvatarFallback className="bg-orange-500">
+                    {userInfo?.name ? userInfo.name.substring(0, 2).toUpperCase() : "US"}
+                  </AvatarFallback>
                 </Avatar>
-                <span className="hidden md:block">João Silva</span>
+                <span className="hidden md:block">{userInfo?.name || "Usuário"}</span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-52 border-gray-800 bg-black text-gray-200">
@@ -65,7 +71,12 @@ export function AppTopbar({ onOpenSidebar }: AppTopbarProps) {
               <DropdownMenuItem className="focus:bg-gray-900">Perfil</DropdownMenuItem>
               <DropdownMenuItem className="focus:bg-gray-900">Configurações</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-400 focus:bg-red-500/10">Sair</DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-400 focus:bg-red-500/10 cursor-pointer"
+                onClick={logout}
+              >
+                Sair
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
