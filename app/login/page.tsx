@@ -74,17 +74,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800/50 via-slate-900/50 to-slate-950/50"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-950 via-orange-950 to-zinc-950 p-4">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-800/10 via-zinc-900/50 to-zinc-950/100"></div>
 
-      <Card className="w-full max-w-md border-slate-700 bg-slate-800/50 backdrop-blur-xl shadow-2xl relative z-10">
+      <Card className="w-full max-w-md border-orange-400 bg-zinc-950 backdrop-blur-xl shadow-2xl relative z-10">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold tracking-tight text-white">
-            Bem-vindo
+          <CardTitle className="flex flex-col items-center justify-center text-3xl font-bold tracking-tight text-zinc-300 space-y-2 py-8">
+            <img src="/Assinatura-Principal-Laranja-e-Branca.svg" alt="EngNet" width={300} className="mx-auto" />
           </CardTitle>
-          <CardDescription className="text-slate-400">
-            Entre com suas credenciais para acessar o sistema
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -94,13 +91,13 @@ export default function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-200">Email</FormLabel>
+                    <FormLabel className="text-zinc-200">Email</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
+                        <Mail className="absolute left-3 top-2.5 h-5 w-5 text-zinc-500" />
                         <Input
                           placeholder="seu@email.com"
-                          className="pl-10 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:ring-primary focus:border-primary"
+                          className="pl-10 bg-zinc-900/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-primary focus:border-primary"
                           {...field}
                         />
                       </div>
@@ -114,14 +111,14 @@ export default function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-200">Senha</FormLabel>
+                    <FormLabel className="text-zinc-200">Senha</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
+                        <Lock className="absolute left-3 top-2.5 h-5 w-5 text-zinc-500" />
                         <Input
                           type="password"
                           placeholder="••••••••"
-                          className="pl-10 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:ring-primary focus:border-primary"
+                          className="pl-10 bg-zinc-900/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-primary focus:border-primary"
                           {...field}
                         />
                       </div>
@@ -139,7 +136,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-11 font-medium transition-all duration-200"
+                className="w-full bg-orange-500 hover:bg-orange-700 text-white h-11 font-medium transition-all duration-200"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -154,8 +151,8 @@ export default function LoginPage() {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="text-center text-sm text-slate-500 justify-center">
-          Sistema de Gestão Empresarial
+        <CardFooter className="text-center text-sm text-zinc-500 justify-center">
+          Sistema de Gestão Empresarial da EngNet
         </CardFooter>
       </Card>
     </div>
