@@ -15,6 +15,19 @@ interface Notification {
   type: 'success' | 'error' | 'warning' | 'info';
   timestamp: Date;
 }
+type AppContextType = {
+  userInfo: User | null;
+  token: string | null;
+  setUserInfo: (user: User | null) => void;
+  setToken: (t: string | null) => void;
+  addNotification: (n: any) => void;
+};
+
+const [userInfo, setUserInfo] = useState<User | null>(null);
+const [token, setToken] = useState<string | null>(null);
+const res = await apiLogin(email, password);
+setToken(res.access_token);
+setUserInfo(res.user);
 
 interface AppContextType {
   // Estado do usuário
