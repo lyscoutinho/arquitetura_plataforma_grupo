@@ -60,11 +60,12 @@ export default function Dashboard() {
         description="Visão geral de Contratos, Clientes e Reembolsos"
         actions={
           <div className="flex gap-2">
-            <Button onClick={handleWelcomeUser} className="bg-gray-700 hover:bg-gray-600 text-white">
+            <Button onClick={() => navigate("/login", true)}
+              className="bg-gray-700 hover:bg-gray-600 text-white">
               <div className="flex items-center gap-2">
-                {userInfo ? `Olá, ${userInfo.name}` : <><LogIn className="h-4 w-4" /> Login</>}
-              </div>
-            </Button>
+              {userInfo ? `Olá, ${userInfo.name}` : <><LogIn className="h-4 w-4" /> Login</>}
+              </div></Button>
+
             <Link href="/transacao/nova" passHref>
               <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
                 Nova Transação
