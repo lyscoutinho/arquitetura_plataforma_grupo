@@ -132,12 +132,12 @@ export default function MembrosPage() {
                 onChange={(e) => handleChange("diretoria", e.target.value)}
               >
                 <option value="">Selecione a diretoria</option>
-                <option value="Comercial">Comercial</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Operações">Operações</option>
-                <option value="Projetos">Projetos</option>
-                <option value="Presidência Organizacional">Presidência Organizacional</option>
-                <option value="Presidência Institucional">Presidência Institucional</option>
+                <option value="comercial">Comercial</option>
+                <option value="marketing">Marketing</option>
+                <option value="operacoes">Operações</option>
+                <option value="projetos">Projetos</option>
+                <option value="presidencia organizacional">Presidência Organizacional</option>
+                <option value="presidencia institucional">Presidência Institucional</option>
               </select>
 
             </div>
